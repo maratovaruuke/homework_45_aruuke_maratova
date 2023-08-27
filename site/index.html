@@ -1,0 +1,14 @@
+@{
+    Layout = "layout";
+}
+<h1>@Model?.Title</h1>
+@if(Model?.X > 0){   
+    <h2> X > 0 </h2>
+}
+@for(int i = 0; i < 10; i++)
+{
+    <p>Line @i</p>
+}
+@foreach(var user in Model?.Users){
+    <p>@user.Name</p>
+}
