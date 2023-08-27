@@ -1,0 +1,42 @@
+[
+  {
+    "Id": 1,
+    "Name": "Aruuke Maratova",
+    "Age": 24
+  },
+  {
+    "Id": 2,
+    "Name": "John Smith",
+    "Age": 30
+  },
+  {
+    "Id": 3,
+    "Name": "Anny Jackson",
+    "Age": 22
+  },
+  {
+    "Id": 4,
+    "Name": "Freddy Jackson",
+    "Age": 24
+  },
+  {
+    "Id": 5,
+    "Name": "Rick Doe",
+    "Age": 34
+  },
+  {
+    "Id": 6,
+    "Name": "Nate Kim",
+    "Age": 24
+  },
+  {
+    "Id": 7,
+    "Name": "Irina Kairatova",
+    "Age": 25
+  },
+  {
+    "Id": 8,
+    "Name": "JAX",
+    "Age": 24
+  }
+]

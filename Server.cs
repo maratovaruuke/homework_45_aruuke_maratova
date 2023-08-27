@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using System.Reflection.Metadata;
 using RazorEngine;
 using RazorEngine.Templating;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
 
 namespace homework_45_aruuke_maratova
 {
@@ -16,6 +19,13 @@ namespace homework_45_aruuke_maratova
         private string _siteDirectory;
         private HttpListener _listener;
         private int _port;
+
+        JsonSerializerOptions options = new JsonSerializerOptions()
+        {
+            AllowTrailingCommas = true,
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+            WriteIndented = true
+        };
 
         public Server(string path, int port)
         {
@@ -58,9 +68,11 @@ namespace homework_45_aruuke_maratova
         private void Process(HttpListenerContext httpListenerContext)
         {
             //httpListenerContext.Request.HttpMethod
+
             string fileName = httpListenerContext.Request.Url.AbsolutePath;
-            string query = httpListenerContext.Request.Url.Query;
+        
             fileName = fileName.Substring(1);
+ 
             fileName = Path.Combine(_siteDirectory, fileName);
             Console.WriteLine(fileName);
             string content = "";
@@ -68,7 +80,7 @@ namespace homework_45_aruuke_maratova
             {
                 if (fileName.Contains("html"))
                 {
-                    content = BuildHtml(fileName);
+                    content = BuildHtml(fileName, httpListenerContext);
                 }
                 else
                 {
@@ -131,10 +143,11 @@ namespace homework_45_aruuke_maratova
 
             return contentType;
         }
-        private string BuildHtml(string fileName)
+        private string BuildHtml(string fileName, HttpListenerContext context)
         {
             string html = "";
             string layoutPath = Path.Combine(_siteDirectory, "layout.html");
+            var query = context.Request.QueryString;
             var razorService = Engine.Razor;
 
             if (!razorService.IsTemplateCached(razorService.GetKey("layout"), null))
@@ -144,14 +157,27 @@ namespace homework_45_aruuke_maratova
                 razorService.AddTemplate(razorService.GetKey(fileName), File.ReadAllText(fileName));
                 razorService.Compile(razorService.GetKey(fileName));
             }
-            List<User> users = new List<User>();
-            users.Add(new User() { Name = "Igor" });
+            string json = File.ReadAllText("../../../employees.json");
+
+            List<Employee> employees;
+
+            employees = JsonSerializer.Deserialize<List<Employee>>(File.ReadAllText("../../../employees.json"));
+
+            if(query.HasKeys())
+            {
+                int IdFrom = Convert.ToInt32(query.Get("IdFrom"));
+                int IdTo = Convert.ToInt32(query.Get("IdTo"));
+                Console.WriteLine("IdFrom" + IdFrom);
+                Console.WriteLine("IdTo" + IdTo);
+                employees = employees.Where(x => x.Id >= IdFrom && x.Id <= IdTo).ToList();
+            }
+
             html = razorService.Run(razorService.GetKey(fileName), null, new
             {
                 Title = "Hello World!",
                 X = 1,
                 Text = "Main Page",
-                Users = users
+                Employees = employees
             });
             return html;
         }
